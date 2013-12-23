@@ -19,6 +19,8 @@
 		43E96FCB1868DD71008E0CDD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43E96FB31868DD71008E0CDD /* UIKit.framework */; };
 		43E96FD31868DD71008E0CDD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 43E96FD11868DD71008E0CDD /* InfoPlist.strings */; };
 		43E96FD51868DD71008E0CDD /* ResplendentFacebookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 43E96FD41868DD71008E0CDD /* ResplendentFacebookTests.m */; };
+		43E96FE51868DE58008E0CDD /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43E96FE01868DE58008E0CDD /* FacebookSDK.framework */; };
+		43E96FE61868DE58008E0CDD /* RFBFacebookController.m in Sources */ = {isa = PBXBuildFile; fileRef = 43E96FE31868DE58008E0CDD /* RFBFacebookController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +50,13 @@
 		43E96FD01868DD71008E0CDD /* ResplendentFacebookTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ResplendentFacebookTests-Info.plist"; sourceTree = "<group>"; };
 		43E96FD21868DD71008E0CDD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		43E96FD41868DD71008E0CDD /* ResplendentFacebookTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResplendentFacebookTests.m; sourceTree = "<group>"; };
+		43E96FE01868DE58008E0CDD /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
+		43E96FE21868DE58008E0CDD /* RFBFacebookController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RFBFacebookController.h; sourceTree = "<group>"; };
+		43E96FE31868DE58008E0CDD /* RFBFacebookController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RFBFacebookController.m; sourceTree = "<group>"; };
+		43E96FE41868DE58008E0CDD /* RFBFacebookControllerProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RFBFacebookControllerProtocols.h; sourceTree = "<group>"; };
+		43E96FED1868DF2D008E0CDD /* RUDebug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RUDebug.h; sourceTree = "<group>"; };
+		43E96FEE1868DF2D008E0CDD /* RUDLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RUDLog.h; sourceTree = "<group>"; };
+		43E96FF01868DFB4008E0CDD /* RUConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RUConstants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +65,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				43E96FB21868DD71008E0CDD /* CoreGraphics.framework in Frameworks */,
+				43E96FE51868DE58008E0CDD /* FacebookSDK.framework in Frameworks */,
 				43E96FB41868DD71008E0CDD /* UIKit.framework in Frameworks */,
 				43E96FB01868DD71008E0CDD /* Foundation.framework in Frameworks */,
 			);
@@ -107,6 +117,7 @@
 		43E96FB51868DD71008E0CDD /* ResplendentFacebook */ = {
 			isa = PBXGroup;
 			children = (
+				43E96FDE1868DE58008E0CDD /* Code */,
 				43E96FBE1868DD71008E0CDD /* RFBAppDelegate.h */,
 				43E96FBF1868DD71008E0CDD /* RFBAppDelegate.m */,
 				43E96FC11868DD71008E0CDD /* Images.xcassets */,
@@ -142,6 +153,52 @@
 				43E96FD11868DD71008E0CDD /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		43E96FDE1868DE58008E0CDD /* Code */ = {
+			isa = PBXGroup;
+			children = (
+				43E96FDF1868DE58008E0CDD /* Framework */,
+				43E96FE11868DE58008E0CDD /* ResplendentFacebook */,
+				43E96FEB1868DF2D008E0CDD /* ResplendentUtilities */,
+			);
+			path = Code;
+			sourceTree = "<group>";
+		};
+		43E96FDF1868DE58008E0CDD /* Framework */ = {
+			isa = PBXGroup;
+			children = (
+				43E96FE01868DE58008E0CDD /* FacebookSDK.framework */,
+			);
+			path = Framework;
+			sourceTree = "<group>";
+		};
+		43E96FE11868DE58008E0CDD /* ResplendentFacebook */ = {
+			isa = PBXGroup;
+			children = (
+				43E96FE21868DE58008E0CDD /* RFBFacebookController.h */,
+				43E96FE31868DE58008E0CDD /* RFBFacebookController.m */,
+				43E96FE41868DE58008E0CDD /* RFBFacebookControllerProtocols.h */,
+			);
+			path = ResplendentFacebook;
+			sourceTree = "<group>";
+		};
+		43E96FEB1868DF2D008E0CDD /* ResplendentUtilities */ = {
+			isa = PBXGroup;
+			children = (
+				43E96FEC1868DF2D008E0CDD /* Misc */,
+			);
+			path = ResplendentUtilities;
+			sourceTree = "<group>";
+		};
+		43E96FEC1868DF2D008E0CDD /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				43E96FF01868DFB4008E0CDD /* RUConstants.h */,
+				43E96FED1868DF2D008E0CDD /* RUDebug.h */,
+				43E96FEE1868DF2D008E0CDD /* RUDLog.h */,
+			);
+			path = Misc;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -240,6 +297,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43E96FE61868DE58008E0CDD /* RFBFacebookController.m in Sources */,
 				43E96FBC1868DD71008E0CDD /* main.m in Sources */,
 				43E96FC01868DD71008E0CDD /* RFBAppDelegate.m in Sources */,
 			);
@@ -362,6 +420,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/Benjamin/Documents/Repos/Resplendent/ResplendentFacebook/ResplendentFacebook/Code/Framework,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ResplendentFacebook/ResplendentFacebook-Prefix.pch";
 				INFOPLIST_FILE = "ResplendentFacebook/ResplendentFacebook-Info.plist";
@@ -375,6 +437,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/Benjamin/Documents/Repos/Resplendent/ResplendentFacebook/ResplendentFacebook/Code/Framework,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ResplendentFacebook/ResplendentFacebook-Prefix.pch";
 				INFOPLIST_FILE = "ResplendentFacebook/ResplendentFacebook-Info.plist";
@@ -444,6 +510,7 @@
 				43E96FDA1868DD71008E0CDD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		43E96FDB1868DD71008E0CDD /* Build configuration list for PBXNativeTarget "ResplendentFacebookTests" */ = {
 			isa = XCConfigurationList;
@@ -452,6 +519,7 @@
 				43E96FDD1868DD71008E0CDD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
