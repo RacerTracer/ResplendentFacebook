@@ -20,6 +20,8 @@
 
 @property (nonatomic, readonly) FBSession* _currentSession;
 
+-(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSInteger)facebookId;
+
 - (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error;
 
 - (void)clearFacebookSession;
@@ -123,65 +125,34 @@
 	return (self.currentSession ?: [FBSession activeSession]);
 }
 
-
--(NSArray *)readPermissions
-{
-    return nil;
-}
-
--(NSArray *)publishPermissions
-{
-    return nil;
-}
-
 -(FBAccessTokenData *)accessTokenData
 {
     return self.currentSession.accessTokenData;
 }
 
 #pragma mark - Static Share Actions
--(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId
+-(void)sendInviteToFriendViaMessageWithFacebookId:(NSInteger)facebookId message:(NSString*)message title:(NSString*)title
 {
-    NSDictionary *dict = [[NSBundle mainBundle] infoDictionary];
-    NSString* facebookAppId = [dict objectForKey:@"FacebookAppID"];
-
-    if (facebookAppId.length)
-    {
-        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithDictionary:@{@"app_id": facebookAppId,@"to":RUStringWithFormat(@"%i",facebookId)}];
-        
-        NSString* link = [self shareLink];
-        if (link.length)
-        {
-            [params setObject:link forKey:@"link"];
-        }
-        
-        NSString* name = [self shareName];
-        if (name.length)
-        {
-            [params setObject:name forKey:@"name"];
-        }
-        
-        NSString* caption = [self shareCaption];
-        if (caption.length)
-        {
-            [params setObject:name forKey:@"caption"];
-        }
-        
-        NSString* description = [self shareDescription];
-        if (description.length)
-        {
-            [params setObject:name forKey:@"description"];
-        }
-
-		[FBWebDialogs presentFeedDialogModallyWithSession:self._currentSession parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
-//		[FBWebDialogs presentDialogModallyWithSession:self._currentSession dialog:@"feed" parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+	NSMutableDictionary* params = [self webDialogShareParamsWithTargetShareUserId:facebookId];
+	
+	if (params)
+	{
+		[FBWebDialogs presentRequestsDialogModallyWithSession:self._currentSession message:message title:title parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
             [self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
         }];
-    }
-    else
-    {
-        RUDLog(@"can't find facebook app id");
-    }
+	}
+}
+
+-(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId
+{
+	NSMutableDictionary* params = [self webDialogShareParamsWithTargetShareUserId:facebookId];
+
+	if (params)
+	{
+		[FBWebDialogs presentFeedDialogModallyWithSession:self._currentSession parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+            [self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
+        }];
+	}
 }
 
 #pragma mark - Post Action methods
@@ -212,10 +183,46 @@
     return params;
 }
 
-#pragma mark - Static Getters
--(NSString*)shareLink{return nil;}
--(NSString*)shareName{return nil;}
--(NSString*)shareCaption{return nil;}
--(NSString*)shareDescription{return nil;}
+#pragma mark - Params
+-(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSInteger)facebookId
+{
+	NSDictionary *dict = [[NSBundle mainBundle] infoDictionary];
+    NSString* facebookAppId = [dict objectForKey:@"FacebookAppID"];
+	
+    if (facebookAppId.length)
+    {
+        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithDictionary:@{@"app_id": facebookAppId,@"to":RUStringWithFormat(@"%i",facebookId)}];
+        
+        NSString* link = [self shareLink];
+        if (link.length)
+        {
+            [params setObject:link forKey:@"link"];
+        }
+        
+        NSString* name = [self shareName];
+        if (name.length)
+        {
+            [params setObject:name forKey:@"name"];
+        }
+        
+        NSString* caption = [self shareCaption];
+        if (caption.length)
+        {
+            [params setObject:name forKey:@"caption"];
+        }
+        
+        NSString* description = [self shareDescription];
+        if (description.length)
+        {
+            [params setObject:name forKey:@"description"];
+        }
+
+		return params;
+	}
+	else
+	{
+		return nil;
+	}
+}
 
 @end
