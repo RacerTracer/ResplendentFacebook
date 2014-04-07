@@ -173,7 +173,8 @@
             [params setObject:name forKey:@"description"];
         }
 
-		[FBWebDialogs presentDialogModallyWithSession:self._currentSession dialog:@"feed" parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+		[FBWebDialogs presentFeedDialogModallyWithSession:self._currentSession parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+//		[FBWebDialogs presentDialogModallyWithSession:self._currentSession dialog:@"feed" parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
             [self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
         }];
     }
