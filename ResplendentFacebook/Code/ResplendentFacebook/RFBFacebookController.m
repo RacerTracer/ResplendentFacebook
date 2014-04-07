@@ -12,13 +12,23 @@
 
 #import <FacebookSDK/FacebookSDK.h>
 
+
+
+
+
 @interface RFBFacebookController ()
+
+@property (nonatomic, readonly) FBSession* _currentSession;
 
 - (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error;
 
 - (void)clearFacebookSession;
 
 @end
+
+
+
+
 
 @implementation RFBFacebookController
 
@@ -86,19 +96,19 @@
             if (error)
             {
                 RUDLog(@"FBSessionStateOpen had error %@",error.localizedDescription);
-                [_delegate facebookController:self didFailWithError:error];
+                [self.delegate facebookController:self didFailWithError:error];
             }
             else
             {
                 // We have a valid session
-                [_delegate facebookController:self didLogInWithToken:session.accessTokenData];
+                [self.delegate facebookController:self didLogInWithToken:session.accessTokenData];
             }
             break;
             
         case FBSessionStateClosed:
         case FBSessionStateClosedLoginFailed:
             [self clearFacebookSession];
-            [_delegate facebookControllerClearedToken:self];
+            [self.delegate facebookControllerClearedToken:self];
             break;
             
         default:
@@ -108,6 +118,12 @@
 }
 
 #pragma mark - Getter methods
+-(FBSession *)_currentSession
+{
+	return (self.currentSession ?: [FBSession activeSession]);
+}
+
+
 -(NSArray *)readPermissions
 {
     return nil;
@@ -120,11 +136,11 @@
 
 -(FBAccessTokenData *)accessTokenData
 {
-    return FBSession.activeSession.accessTokenData;
+    return self.currentSession.accessTokenData;
 }
 
 #pragma mark - Static Share Actions
-+(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId
+-(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId
 {
     NSDictionary *dict = [[NSBundle mainBundle] infoDictionary];
     NSString* facebookAppId = [dict objectForKey:@"FacebookAppID"];
@@ -156,8 +172,8 @@
         {
             [params setObject:name forKey:@"description"];
         }
-        
-        [FBWebDialogs presentDialogModallyWithSession:[FBSession activeSession] dialog:@"feed" parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+
+		[FBWebDialogs presentDialogModallyWithSession:self._currentSession dialog:@"feed" parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
             [self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
         }];
     }
@@ -168,7 +184,7 @@
 }
 
 #pragma mark - Post Action methods
-+(void)didFinishPostingToWallOfUserWithFacebookId:(NSInteger)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error
+-(void)didFinishPostingToWallOfUserWithFacebookId:(NSInteger)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error
 {
     if (error)
     {
@@ -179,7 +195,7 @@
 }
 
 #pragma mark - Parsing
-+(NSDictionary*)parseURLParams:(NSString *)query
+-(NSDictionary*)parseURLParams:(NSString *)query
 {
     NSArray *pairs = [query componentsSeparatedByString:@"&"];
     NSMutableDictionary *params = [NSMutableDictionary new];
@@ -196,9 +212,9 @@
 }
 
 #pragma mark - Static Getters
-+(NSString*)shareLink{return nil;}
-+(NSString*)shareName{return nil;}
-+(NSString*)shareCaption{return nil;}
-+(NSString*)shareDescription{return nil;}
+-(NSString*)shareLink{return nil;}
+-(NSString*)shareName{return nil;}
+-(NSString*)shareCaption{return nil;}
+-(NSString*)shareDescription{return nil;}
 
 @end

@@ -21,11 +21,20 @@
 
 @interface RFBFacebookController : NSObject
 
-@property (nonatomic, assign) id<RFBFacebookControllerDelegate> delegate;
-@property (nonatomic, readonly) FBAccessTokenData* accessTokenData;
 
+@property (nonatomic, assign) id<RFBFacebookControllerDelegate> delegate;
+
+//Subclasses can overload
+@property (nonatomic, readonly) FBSession* currentSession; //If nil, will use [FBSession activeSession]
+@property (nonatomic, readonly) FBAccessTokenData* accessTokenData; //default implementation uses self.currentSession.accessTokenData.
 @property (nonatomic, readonly) NSArray* readPermissions;
 @property (nonatomic, readonly) NSArray* publishPermissions;
+
+//Share on facebook variables. Subclasses should overloaded
+@property (nonatomic, readonly) NSString* shareLink;
+@property (nonatomic, readonly) NSString* shareName;
+@property (nonatomic, readonly) NSString* shareCaption;
+@property (nonatomic, readonly) NSString* shareDescription;
 
 //Performs clear and calls delegate
 - (void)logout;
@@ -41,17 +50,11 @@
 - (void)applicationDidBecomeActive;
 
 //Share on facebook actions
-+(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId;
+-(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId;
 
 //Meant to be overloaded by subclasses. Should never be called directly.
-+(void)didFinishPostingToWallOfUserWithFacebookId:(NSInteger)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
+-(void)didFinishPostingToWallOfUserWithFacebookId:(NSInteger)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
 
-+(NSDictionary*)parseURLParams:(NSString *)query;
-
-//Share on facebook variables. Subclasses should overloaded
-+(NSString*)shareLink;
-+(NSString*)shareName;
-+(NSString*)shareCaption;
-+(NSString*)shareDescription;
+-(NSDictionary*)parseURLParams:(NSString *)query;
 
 @end
