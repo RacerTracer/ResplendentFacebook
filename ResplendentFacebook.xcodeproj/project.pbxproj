@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		436D03FD1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 436D03FC1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.m */; };
 		43E96FB01868DD71008E0CDD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43E96FAF1868DD71008E0CDD /* Foundation.framework */; };
 		43E96FB21868DD71008E0CDD /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43E96FB11868DD71008E0CDD /* CoreGraphics.framework */; };
 		43E96FB41868DD71008E0CDD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43E96FB31868DD71008E0CDD /* UIKit.framework */; };
@@ -34,6 +35,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		436D03FB1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+RUUtil.h"; sourceTree = "<group>"; };
+		436D03FC1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+RUUtil.m"; sourceTree = "<group>"; };
 		43E96FAC1868DD71008E0CDD /* ResplendentFacebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ResplendentFacebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43E96FAF1868DD71008E0CDD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		43E96FB11868DD71008E0CDD /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -84,6 +87,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		436D03FA1960CBB000FA54E9 /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				436D03FB1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.h */,
+				436D03FC1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
 		43E96FA31868DD71008E0CDD = {
 			isa = PBXGroup;
 			children = (
@@ -186,6 +198,7 @@
 		43E96FEB1868DF2D008E0CDD /* ResplendentUtilities */ = {
 			isa = PBXGroup;
 			children = (
+				436D03FA1960CBB000FA54E9 /* Category */,
 				43E96FEC1868DF2D008E0CDD /* Misc */,
 			);
 			path = ResplendentUtilities;
@@ -297,6 +310,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				436D03FD1960CBB000FA54E9 /* NSMutableDictionary+RUUtil.m in Sources */,
 				43E96FE61868DE58008E0CDD /* RFBFacebookController.m in Sources */,
 				43E96FBC1868DD71008E0CDD /* main.m in Sources */,
 				43E96FC01868DD71008E0CDD /* RFBAppDelegate.m in Sources */,

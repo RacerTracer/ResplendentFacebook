@@ -50,11 +50,11 @@
 - (void)applicationDidBecomeActive;
 
 //Share on facebook actions
--(void)sendInviteToFriendViaMessageWithFacebookId:(NSInteger)facebookId message:(NSString*)message title:(NSString*)title;
--(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId;
+-(void)sendInviteToFriendViaMessageWithFacebookId:(NSString*)facebookId message:(NSString*)message title:(NSString*)title;
+-(void)showInviteOnFriendsWallWithFacebookId:(NSString*)facebookId;
 
 //Meant to be overloaded by subclasses. Should never be called directly.
--(void)didFinishPostingToWallOfUserWithFacebookId:(NSInteger)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
+-(void)didFinishPostingToWallOfUserWithFacebookId:(NSString*)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
 
 -(NSDictionary*)parseURLParams:(NSString *)query;
 
