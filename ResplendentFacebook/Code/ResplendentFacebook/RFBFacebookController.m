@@ -9,6 +9,7 @@
 #import "RFBFacebookController.h"
 #import "RUDLog.h"
 #import "RUConstants.h"
+#import "NSMutableDictionary+RUUtil.h"
 
 #import <FacebookSDK/FacebookSDK.h>
 
@@ -20,7 +21,7 @@
 
 @property (nonatomic, readonly) FBSession* _currentSession;
 
--(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSInteger)facebookId;
+-(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSString*)facebookId;
 
 - (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error;
 
@@ -131,7 +132,7 @@
 }
 
 #pragma mark - Static Share Actions
--(void)sendInviteToFriendViaMessageWithFacebookId:(NSInteger)facebookId message:(NSString*)message title:(NSString*)title
+-(void)sendInviteToFriendViaMessageWithFacebookId:(NSString*)facebookId message:(NSString*)message title:(NSString*)title
 {
 	NSMutableDictionary* params = [self webDialogShareParamsWithTargetShareUserId:facebookId];
 	
@@ -143,7 +144,7 @@
 	}
 }
 
--(void)showInviteOnFriendsWallWithFacebookId:(NSInteger)facebookId
+-(void)showInviteOnFriendsWallWithFacebookId:(NSString*)facebookId
 {
 	NSMutableDictionary* params = [self webDialogShareParamsWithTargetShareUserId:facebookId];
 
@@ -156,7 +157,7 @@
 }
 
 #pragma mark - Post Action methods
--(void)didFinishPostingToWallOfUserWithFacebookId:(NSInteger)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error
+-(void)didFinishPostingToWallOfUserWithFacebookId:(NSString*)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error
 {
     if (error)
     {
@@ -169,7 +170,9 @@
 #pragma mark - Parsing
 -(NSDictionary*)parseURLParams:(NSString *)query
 {
-    NSArray *pairs = [query componentsSeparatedByString:@"&"];
+	NSString* decodedQuery = [query stringByReplacingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
+
+    NSArray *pairs = [decodedQuery componentsSeparatedByString:@"&"];
     NSMutableDictionary *params = [NSMutableDictionary new];
     
     for (NSString *pair in pairs)
@@ -184,38 +187,19 @@
 }
 
 #pragma mark - Params
--(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSInteger)facebookId
+-(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSString*)facebookId
 {
 	NSDictionary *dict = [[NSBundle mainBundle] infoDictionary];
     NSString* facebookAppId = [dict objectForKey:@"FacebookAppID"];
 	
     if (facebookAppId.length)
     {
-        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithDictionary:@{@"app_id": facebookAppId,@"to":RUStringWithFormat(@"%i",facebookId)}];
+        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithDictionary:@{@"app_id": facebookAppId,@"to":facebookId}];
         
-        NSString* link = [self shareLink];
-        if (link.length)
-        {
-            [params setObject:link forKey:@"link"];
-        }
-        
-        NSString* name = [self shareName];
-        if (name.length)
-        {
-            [params setObject:name forKey:@"name"];
-        }
-        
-        NSString* caption = [self shareCaption];
-        if (caption.length)
-        {
-            [params setObject:name forKey:@"caption"];
-        }
-        
-        NSString* description = [self shareDescription];
-        if (description.length)
-        {
-            [params setObject:name forKey:@"description"];
-        }
+		[params setObjectOrRemoveIfNil:[self shareLink] forKey:@"link"];
+		[params setObjectOrRemoveIfNil:[self shareName] forKey:@"name"];
+		[params setObjectOrRemoveIfNil:[self shareCaption] forKey:@"caption"];
+		[params setObjectOrRemoveIfNil:[self shareDescription] forKey:@"description"];
 
 		return params;
 	}
