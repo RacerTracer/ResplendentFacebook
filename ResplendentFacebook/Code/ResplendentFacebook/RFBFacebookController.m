@@ -10,6 +10,7 @@
 #import "RUDLog.h"
 #import "RUConstants.h"
 #import "NSMutableDictionary+RUUtil.h"
+#import "RFBNativeParamsBuilder.h"
 
 #import <FacebookSDK/FacebookSDK.h>
 
@@ -26,6 +27,8 @@
 - (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error;
 
 - (void)clearFacebookSession;
+
+-(void)presentNativeFeedDialogModallyWithSessionWithFBSession:(FBSession*)fbSession handler:(FBWebDialogHandler)handler;
 
 @end
 
@@ -206,6 +209,40 @@
 	else
 	{
 		return nil;
+	}
+}
+
+#pragma mark - Native Feed Dialog
+-(void)presentNativeFeedDialogModallyWithSessionWithFBSession:(FBSession*)fbSession handler:(FBWebDialogHandler)handler
+{
+	RFBNativeParamsBuilder* nativeParamsBuilder = [RFBNativeParamsBuilder new];
+
+	[nativeParamsBuilder setFacebookAppIdFromMainBundlePlist];
+
+	[nativeParamsBuilder setName:self.shareName];
+	[nativeParamsBuilder setDescription:self.shareDescription];
+	[nativeParamsBuilder setCaption:self.shareCaption];
+	[nativeParamsBuilder setLinkUrl:self.shareLink];
+
+	NSDictionary* params = [nativeParamsBuilder createParamsDictionary];
+	
+	[FBWebDialogs presentFeedDialogModallyWithSession:fbSession parameters:params handler:handler];
+}
+
+-(void)presentNativeFeedDialogModallyWithSessionWithHandler:(FBWebDialogHandler)handler
+{
+	FBSession* currentSession = self.currentSession;
+	if (currentSession)
+	{
+		[self presentNativeFeedDialogModallyWithSessionWithFBSession:currentSession handler:handler];
+	}
+	else
+	{
+		[FBSession openActiveSessionWithReadPermissions:self.readPermissions allowLoginUI:YES completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+			
+			[self presentNativeFeedDialogModallyWithSessionWithFBSession:session handler:handler];
+			
+		}];
 	}
 }
 

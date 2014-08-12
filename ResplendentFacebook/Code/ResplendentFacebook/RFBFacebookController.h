@@ -53,6 +53,9 @@
 -(void)sendInviteToFriendViaMessageWithFacebookId:(NSString*)facebookId message:(NSString*)message title:(NSString*)title;
 -(void)showInviteOnFriendsWallWithFacebookId:(NSString*)facebookId;
 
+//Native modals
+-(void)presentNativeFeedDialogModallyWithSessionWithHandler:(FBWebDialogHandler)handler;
+
 //Meant to be overloaded by subclasses. Should never be called directly.
 -(void)didFinishPostingToWallOfUserWithFacebookId:(NSString*)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
 
