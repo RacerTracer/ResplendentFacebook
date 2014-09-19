@@ -20,7 +20,7 @@
 
 //Optional
 @property (nonatomic, strong) NSString* caption;
-@property (nonatomic, strong) NSString* description;
+@property (nonatomic, strong) NSString* shareDescription;
 @property (nonatomic, strong) NSString* name;
 @property (nonatomic, strong) NSString* linkUrl;
 @property (nonatomic, strong) NSString* pictureUrl;

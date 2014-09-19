@@ -42,7 +42,7 @@
 
 	[params setObjectOrRemoveIfNil:self.name forKey:@"name"];
 	[params setObjectOrRemoveIfNil:self.caption forKey:@"caption"];
-	[params setObjectOrRemoveIfNil:self.description forKey:@"description"];
+	[params setObjectOrRemoveIfNil:self.shareDescription forKey:@"description"];
 	[params setObjectOrRemoveIfNil:self.linkUrl forKey:@"link"];
 	[params setObjectOrRemoveIfNil:self.pictureUrl forKey:@"picture"];
 

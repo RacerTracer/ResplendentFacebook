@@ -220,7 +220,7 @@
 	[nativeParamsBuilder setFacebookAppIdFromMainBundlePlist];
 
 	[nativeParamsBuilder setName:self.shareName];
-	[nativeParamsBuilder setDescription:self.shareDescription];
+	[nativeParamsBuilder setShareDescription:self.shareDescription];
 	[nativeParamsBuilder setCaption:self.shareCaption];
 	[nativeParamsBuilder setLinkUrl:self.shareLink];
 
