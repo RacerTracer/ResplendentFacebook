@@ -74,8 +74,8 @@
 //Meant to be overloaded by subclasses. Should never be called directly.
 -(void)didFinishPostingToWallOfUserWithFacebookId:(NSString*)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
 
--(NSDictionary*)parseURLParams:(NSString *)query;
++(NSDictionary*)parseURLParams:(NSString *)query;
 
--(BOOL)completedWebDialogWasSuccessWithResultUrl:(NSURL*)resultURL;
++(BOOL)completedWebDialogWasSuccessWithResultUrl:(NSURL*)resultURL;
 
 @end

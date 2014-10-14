@@ -226,7 +226,7 @@
 }
 
 #pragma mark - Post Action methods
--(BOOL)completedWebDialogWasSuccessWithResultUrl:(NSURL*)resultURL
++(BOOL)completedWebDialogWasSuccessWithResultUrl:(NSURL*)resultURL
 {
 	NSDictionary *urlParams = kRUDictionaryOrNil([self parseURLParams:[resultURL query]]);
 	
@@ -264,7 +264,7 @@
 	{
 		case FBWebDialogResultDialogCompleted:
 		{
-			if ([self completedWebDialogWasSuccessWithResultUrl:resultURL])
+			if ([self.class completedWebDialogWasSuccessWithResultUrl:resultURL])
 			{
 				RUDLog(@"success!");
 			}
@@ -277,7 +277,7 @@
 }
 
 #pragma mark - Parsing
--(NSDictionary*)parseURLParams:(NSString *)query
++(NSDictionary*)parseURLParams:(NSString *)query
 {
 	NSString* decodedQuery = [query stringByReplacingPercentEscapesUsingEncoding:NSASCIIStringEncoding];
 
