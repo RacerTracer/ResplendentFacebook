@@ -20,10 +20,13 @@
 
 //Optional
 @property (nonatomic, strong) NSString* caption;
-@property (nonatomic, strong) NSString* description;
+@property (nonatomic, strong) NSString* shareDescription;
 @property (nonatomic, strong) NSString* name;
 @property (nonatomic, strong) NSString* linkUrl;
 @property (nonatomic, strong) NSString* pictureUrl;
+@property (nonatomic, strong) NSString* message;
+
+@property (nonatomic, strong) NSString* toFacebookUserId; //facebook id for user to post on wall to
 
 -(NSDictionary*)createParamsDictionary;
 

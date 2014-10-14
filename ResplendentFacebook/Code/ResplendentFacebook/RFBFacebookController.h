@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "RFBFacebookControllerProtocols.h"
 #import <FacebookSDK/FBWebDialogs.h>
+#import <FacebookSDK/FBSession.h>
 
 /*
  To compile, the following is required:
@@ -36,18 +37,32 @@
 @property (nonatomic, readonly) NSString* shareCaption;
 @property (nonatomic, readonly) NSString* shareDescription;
 
-//Performs clear and calls delegate
+// ++ Performs clear and calls delegate
 - (void)logout;
 
 -(void)closeFacebookSession;
 
-//Method used to login.
+// ++ Method used to login.
 - (BOOL)openSessionWithAllowLoginUI:(BOOL)allowLoginUI;
+- (BOOL)openSessionWithAllowLoginUI:(BOOL)allowLoginUI completionHandler:(FBSessionStateHandler)handler;
 
-//Application Delegate Methods
+// ++ Application Delegate Methods
 - (BOOL)applicationOpenedURL:(NSURL *)url;
 - (void)applicationWillTerminate;
 - (void)applicationDidBecomeActive;
+
+// ++ Publishing
+-(BOOL)currentSessionsContainPublishPermissions;
+
+//Returns TRUE if permissions are requested, otherwise returns FALSE
+-(BOOL)registerForPublishPermissionsForDefaultAudience:(FBSessionDefaultAudience)defaultAudience completion:(FBSessionRequestPermissionResultHandler)completion;
+
+// ++ Feed actions
+-(void)postToFeedForUserWithId:(NSString*)facebookUserId
+					   handler:(FBWebDialogHandler)handler;
+
+-(void)presentFeedDialogModallyWithParams:(NSDictionary*)params
+								  handler:(FBWebDialogHandler)handler;
 
 //Share on facebook actions
 -(void)sendInviteToFriendViaMessageWithFacebookId:(NSString*)facebookId message:(NSString*)message title:(NSString*)title;
@@ -60,5 +75,7 @@
 -(void)didFinishPostingToWallOfUserWithFacebookId:(NSString*)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error;
 
 -(NSDictionary*)parseURLParams:(NSString *)query;
+
+-(BOOL)completedWebDialogWasSuccessWithResultUrl:(NSURL*)resultURL;
 
 @end

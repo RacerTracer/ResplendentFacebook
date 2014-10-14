@@ -11,6 +11,7 @@
 #import "RUConstants.h"
 #import "NSMutableDictionary+RUUtil.h"
 #import "RFBNativeParamsBuilder.h"
+#import "RUConditionalReturn.h"
 
 #import <FacebookSDK/FacebookSDK.h>
 
@@ -22,13 +23,15 @@
 
 @property (nonatomic, readonly) FBSession* _currentSession;
 
--(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSString*)facebookId;
+-(RFBNativeParamsBuilder*)createNativeParamsBuilderWithCurrentSettings;
+
+//-(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSString*)facebookId;
 
 - (void)sessionStateChanged:(FBSession *)session state:(FBSessionState) state error:(NSError *)error;
 
 - (void)clearFacebookSession;
 
--(void)presentNativeFeedDialogModallyWithSessionWithFBSession:(FBSession*)fbSession handler:(FBWebDialogHandler)handler;
+-(void)presentFeedDialogModallyWithCurrentShareParamsAndHandler:(FBWebDialogHandler)handler;
 
 @end
 
@@ -45,8 +48,18 @@
  */
 - (BOOL)openSessionWithAllowLoginUI:(BOOL)allowLoginUI
 {
+	return [self openSessionWithAllowLoginUI:allowLoginUI completionHandler:nil];
+}
+
+- (BOOL)openSessionWithAllowLoginUI:(BOOL)allowLoginUI completionHandler:(FBSessionStateHandler)handler
+{
     return [FBSession openActiveSessionWithReadPermissions:self.readPermissions allowLoginUI:YES completionHandler:^(FBSession *session, FBSessionState state, NSError *error) {
         [self sessionStateChanged:session state:state error:error];
+
+		if (handler)
+		{
+			handler(session,state,error);
+		}
     }];
 }
 
@@ -123,6 +136,59 @@
     }
 }
 
+#pragma mark - Publishing
+-(BOOL)currentSessionsContainPublishPermissions
+{
+	kRUConditionalReturn_ReturnValueFalse(self.currentSession == nil, YES);
+
+	for (NSString* publishPermission in self.publishPermissions)
+	{
+		if ([self.currentSession.permissions containsObject:publishPermission] == false)
+		{
+			return NO;
+		}
+	}
+
+	return YES;
+}
+
+-(BOOL)registerForPublishPermissionsForDefaultAudience:(FBSessionDefaultAudience)defaultAudience completion:(FBSessionRequestPermissionResultHandler)completion
+{
+	kRUConditionalReturn_ReturnValueFalse(self.currentSession == nil, YES);
+	kRUConditionalReturn_ReturnValueFalse(self.currentSessionsContainPublishPermissions, NO);
+
+	[self.currentSession requestNewPublishPermissions:self.publishPermissions
+									  defaultAudience:defaultAudience
+									completionHandler:completion];
+
+	return YES;
+}
+
+-(void)postToFeedForUserWithId:(NSString*)facebookUserId
+					   handler:(FBWebDialogHandler)handler
+{
+	RFBNativeParamsBuilder* nativeParamsBuilder = [self createNativeParamsBuilderWithCurrentSettings];
+	[nativeParamsBuilder setToFacebookUserId:facebookUserId];
+	NSDictionary* params = [nativeParamsBuilder createParamsDictionary];
+
+	[self presentFeedDialogModallyWithParams:params handler:handler];
+}
+
+-(void)presentFeedDialogModallyWithParams:(NSDictionary*)params
+								  handler:(FBWebDialogHandler)handler
+{
+	[FBWebDialogs presentFeedDialogModallyWithSession:self._currentSession parameters:params handler:handler];
+}
+
+-(void)presentFeedDialogModallyWithCurrentShareParamsAndHandler:(FBWebDialogHandler)handler
+{
+	RFBNativeParamsBuilder* nativeParamsBuilder = [self createNativeParamsBuilderWithCurrentSettings];
+	
+	NSDictionary* params = [nativeParamsBuilder createParamsDictionary];
+	
+	[self presentFeedDialogModallyWithParams:params handler:handler];
+}
+
 #pragma mark - Getter methods
 -(FBSession *)_currentSession
 {
@@ -137,29 +203,48 @@
 #pragma mark - Static Share Actions
 -(void)sendInviteToFriendViaMessageWithFacebookId:(NSString*)facebookId message:(NSString*)message title:(NSString*)title
 {
-	NSMutableDictionary* params = [self webDialogShareParamsWithTargetShareUserId:facebookId];
-	
-	if (params)
-	{
-		[FBWebDialogs presentRequestsDialogModallyWithSession:self._currentSession message:message title:title parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
-            [self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
-        }];
-	}
+	RFBNativeParamsBuilder* paramsBuilder = [self createNativeParamsBuilderWithCurrentSettings];
+	[paramsBuilder setToFacebookUserId:facebookId];
+
+	NSDictionary* params = [paramsBuilder createParamsDictionary];
+
+	[FBWebDialogs presentRequestsDialogModallyWithSession:self._currentSession message:message title:title parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+		[self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
+	}];
 }
 
 -(void)showInviteOnFriendsWallWithFacebookId:(NSString*)facebookId
 {
-	NSMutableDictionary* params = [self webDialogShareParamsWithTargetShareUserId:facebookId];
+	RFBNativeParamsBuilder* paramsBuilder = [self createNativeParamsBuilderWithCurrentSettings];
+	[paramsBuilder setToFacebookUserId:facebookId];
+	
+	NSDictionary* params = [paramsBuilder createParamsDictionary];
 
-	if (params)
-	{
-		[FBWebDialogs presentFeedDialogModallyWithSession:self._currentSession parameters:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
-            [self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
-        }];
-	}
+	[self presentFeedDialogModallyWithParams:params handler:^(FBWebDialogResult result, NSURL *resultURL, NSError *error) {
+		[self didFinishPostingToWallOfUserWithFacebookId:facebookId result:result resultURL:resultURL error:error];
+	}];
 }
 
 #pragma mark - Post Action methods
+-(BOOL)completedWebDialogWasSuccessWithResultUrl:(NSURL*)resultURL
+{
+	NSDictionary *urlParams = kRUDictionaryOrNil([self parseURLParams:[resultURL query]]);
+	
+	NSString* facebookIdFromUrlParams = (urlParams ? [urlParams objectForKey:@"to[0]"] : nil);
+	if (facebookIdFromUrlParams.length)
+	{
+		return YES;
+	}
+	
+	NSString* postId = (urlParams ? [urlParams objectForKey:@"post_id"] : nil);
+	if (postId.length)
+	{
+		return YES;
+	}
+
+	return NO;
+}
+
 -(void)didFinishPostingToWallOfUserWithFacebookId:(NSString*)facebookId result:(FBWebDialogResult)result resultURL:(NSURL*)resultURL error:(NSError*)error
 {
     if (error)
@@ -168,6 +253,27 @@
     }
     
     RUDLog(@"resultURL: %@",resultURL);
+
+	if (facebookId.length == 0)
+	{
+		NSAssert(FALSE, @"Must have facebookId");
+		return;
+	}
+	
+	switch (result)
+	{
+		case FBWebDialogResultDialogCompleted:
+		{
+			if ([self completedWebDialogWasSuccessWithResultUrl:resultURL])
+			{
+				RUDLog(@"success!");
+			}
+		}
+			break;
+			
+		case FBWebDialogResultDialogNotCompleted:
+			break;
+	}
 }
 
 #pragma mark - Parsing
@@ -189,59 +295,34 @@
     return params;
 }
 
-#pragma mark - Params
--(NSMutableDictionary*)webDialogShareParamsWithTargetShareUserId:(NSString*)facebookId
-{
-	NSDictionary *dict = [[NSBundle mainBundle] infoDictionary];
-    NSString* facebookAppId = [dict objectForKey:@"FacebookAppID"];
-	
-    if (facebookAppId.length)
-    {
-        NSMutableDictionary* params = [NSMutableDictionary dictionaryWithDictionary:@{@"app_id": facebookAppId,@"to":facebookId}];
-        
-		[params setObjectOrRemoveIfNil:[self shareLink] forKey:@"link"];
-		[params setObjectOrRemoveIfNil:[self shareName] forKey:@"name"];
-		[params setObjectOrRemoveIfNil:[self shareCaption] forKey:@"caption"];
-		[params setObjectOrRemoveIfNil:[self shareDescription] forKey:@"description"];
-
-		return params;
-	}
-	else
-	{
-		return nil;
-	}
-}
-
-#pragma mark - Native Feed Dialog
--(void)presentNativeFeedDialogModallyWithSessionWithFBSession:(FBSession*)fbSession handler:(FBWebDialogHandler)handler
+#pragma mark - NativeParamsBuilder
+-(RFBNativeParamsBuilder*)createNativeParamsBuilderWithCurrentSettings
 {
 	RFBNativeParamsBuilder* nativeParamsBuilder = [RFBNativeParamsBuilder new];
-
+	
 	[nativeParamsBuilder setFacebookAppIdFromMainBundlePlist];
-
+	
 	[nativeParamsBuilder setName:self.shareName];
-	[nativeParamsBuilder setDescription:self.shareDescription];
+	[nativeParamsBuilder setShareDescription:self.shareDescription];
 	[nativeParamsBuilder setCaption:self.shareCaption];
 	[nativeParamsBuilder setLinkUrl:self.shareLink];
 
-	NSDictionary* params = [nativeParamsBuilder createParamsDictionary];
-	
-	[FBWebDialogs presentFeedDialogModallyWithSession:fbSession parameters:params handler:handler];
+	return nativeParamsBuilder;
 }
 
+#pragma mark - Native Feed Dialog
 -(void)presentNativeFeedDialogModallyWithSessionWithHandler:(FBWebDialogHandler)handler
 {
-	FBSession* currentSession = self.currentSession;
-	if (currentSession)
+	if (self._currentSession)
 	{
-		[self presentNativeFeedDialogModallyWithSessionWithFBSession:currentSession handler:handler];
+		[self presentFeedDialogModallyWithCurrentShareParamsAndHandler:handler];
 	}
 	else
 	{
-		[FBSession openActiveSessionWithReadPermissions:self.readPermissions allowLoginUI:YES completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
-			
-			[self presentNativeFeedDialogModallyWithSessionWithFBSession:session handler:handler];
-			
+		[self openSessionWithAllowLoginUI:YES completionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+
+			[self presentFeedDialogModallyWithCurrentShareParamsAndHandler:handler];
+
 		}];
 	}
 }
